@@ -2,9 +2,9 @@ name: PHP Composer
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 permissions:
   contents: read
@@ -16,9 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: Check PHP Version
+      run: php -v
+
+    - name: Check Composer Version
+      run: composer -V
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
+
+
 
     - name: Cache Composer packages
       id: composer-cache
@@ -28,12 +36,11 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
-
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
-    # - name: Run test suite
-    #   run: composer run-script test
+    - name: Run test suite
+      run: composer run-script test
